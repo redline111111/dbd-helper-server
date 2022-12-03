@@ -1,7 +1,7 @@
 meta:
   environment: node
   toolchain:
-    name: browser
+    name: npm
     version: 16
 run:
   command: npm run start
