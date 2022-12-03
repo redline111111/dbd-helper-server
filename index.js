@@ -1,14 +1,17 @@
 import express from "express";
 import multer from "multer";
 import mongoose from "mongoose";
+import dotenv from 'dotenv';
 
 import { registerValidation, loginValidation } from "./validations/auth.js";
 import { postCreateValidation } from "./validations/post.js";
-import { UserController, PostController } from "./controllers/index.js";
+import cors from 'cors';
+import { UserController, PostController, ProfileController } from "./controllers/index.js";
 import {handleValidationErrors, checkAuth} from "./utils/index.js";
 
+dotenv.config();
 
-mongoose.connect('mongodb+srv://admin:roshanhasfolen11@cluster0.yh0bogl.mongodb.net/entity?retryWrites=true&w=majority')
+mongoose.connect(process.env.MONGODB_URL)
 .then(() => { console.log('DB connect')})
 .catch((err) => console.log(err));
 
@@ -16,6 +19,8 @@ const app = express();
 
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
+
+app.use(cors());
 
 
 const storage = multer.diskStorage({
@@ -30,8 +35,12 @@ const storage = multer.diskStorage({
 const upload = multer({storage});
 
 app.post('/auth/register', registerValidation, handleValidationErrors, UserController.register);
+
 app.post('/auth/login',loginValidation, handleValidationErrors, UserController.login)
 app.get('auth/me', checkAuth, UserController.getMe )
+
+app.get('/profile/:id', ProfileController.data);
+
 
 app.post('/upload', checkAuth, upload.single('image'), (req,res) =>{
     res.json({
@@ -45,7 +54,7 @@ app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, Post
 app.delete('/posts/:id', checkAuth, PostController.remove );
 app.patch('/posts/:id', checkAuth, handleValidationErrors, PostController.update );
 
-app.listen(4444, (err) =>{
+app.listen(process.env.PORT || 80, (err) =>{
     if(err){
         return console.log(err);
     }

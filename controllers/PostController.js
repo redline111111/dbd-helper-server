@@ -34,7 +34,7 @@ export const getOne = async (req,res) =>{
 export const getAll = async (req,res) =>{
     try {
         const posts = await PostModel.find().populate('user').exec();
-
+        
         res.json(posts);
     } catch (error) {
         res.status(500).json({
