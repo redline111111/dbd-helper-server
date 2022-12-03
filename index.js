@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import mongoose from "mongoose";
-
+import dotenv from 'dotenv';
 
 import { registerValidation, loginValidation } from "./validations/auth.js";
 import { postCreateValidation } from "./validations/post.js";
@@ -9,7 +9,9 @@ import cors from 'cors';
 import { UserController, PostController, ProfileController } from "./controllers/index.js";
 import {handleValidationErrors, checkAuth} from "./utils/index.js";
 
-mongoose.connect(process.env.MONGODB_URI)
+dotenv.config();
+
+mongoose.connect(process.env.MONGODB_URL)
 .then(() => { console.log('DB connect')})
 .catch((err) => console.log(err));
 
@@ -52,7 +54,7 @@ app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, Post
 app.delete('/posts/:id', checkAuth, PostController.remove );
 app.patch('/posts/:id', checkAuth, handleValidationErrors, PostController.update );
 
-app.listen(process.env.PORT || 4444, (err) =>{
+app.listen(process.env.PORT || 80, (err) =>{
     if(err){
         return console.log(err);
     }
